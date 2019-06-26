@@ -1,6 +1,6 @@
 {
   "name": "@gyugyu/googleapi-issuer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Google API token issueing CLI",
   "main": "lib/index.js",
   "bin": {
