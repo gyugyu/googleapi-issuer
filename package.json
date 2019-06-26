@@ -1,0 +1,33 @@
+{
+  "name": "@gyugyu/googleapi-issuer",
+  "version": "1.0.0",
+  "description": "Google API token issueing CLI",
+  "main": "lib/index.js",
+  "bin": {
+    "issue-googleapi": "lib/command.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gyugyu/googleapi-issuer.git"
+  },
+  "keywords": [],
+  "author": "Yusuke YAGYU",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gyugyu/googleapi-issuer/issues"
+  },
+  "homepage": "https://github.com/gyugyu/googleapi-issuer#readme",
+  "dependencies": {
+    "commander": "^2.20.0",
+    "googleapis": "^40.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2"
+  }
+}
