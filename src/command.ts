@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import program from 'commander'
+import { program } from 'commander'
 import path from 'path'
 import index from './index'
 
@@ -26,7 +26,12 @@ program
   .option('-s, --scopes <scopes>', 'optional scopes', split, [])
   .action((scope: string, options: Options) => {
     options.scopes.push(scope)
-    index(options)
+    index(options).then(() => {
+      process.exit(0)
+    }).catch(err => {
+      console.error(err)
+      process.exit(1)
+    })
   })
 
 program.parse(process.argv)

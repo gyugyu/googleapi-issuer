@@ -1,7 +1,6 @@
+import { authenticate } from '@google-cloud/local-auth'
 import fs from 'fs'
 import path from 'path'
-import readline from 'readline'
-import { google } from 'googleapis'
 
 interface Options {
   dir: string
@@ -9,38 +8,35 @@ interface Options {
   scopes: string[]
 }
 
-interface Credentials {
-  installed: {
-    client_id: string
-    client_secret: string
-    redirect_uris: string[]
-  }
+interface Credential {
+  client_id: string
+  client_secret: string
+  redirect_uris: string[]
 }
 
-export default (options: Options) => {
-  const content = fs.readFileSync(path.join(options.dir, 'credentials.json'), 'utf8')
+interface Credentials {
+  installed?: Credential
+  web: Credential
+}
+
+export default async (options: Options) => {
+  const credentialsPath = path.join(options.dir, 'credentials.json')
+  const content = fs.readFileSync(credentialsPath, 'utf8')
   const credentials: Credentials = JSON.parse(content)
-  const { client_id, client_secret, redirect_uris } = credentials.installed
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: options.scopes,
+  const credential = credentials.installed || credentials.web
+  const client = await authenticate({
+    scopes: options.scopes,
+    keyfilePath: credentialsPath,
   })
-  console.log('Authorize this app by visiting this url:', authUrl)
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
-  rl.question('Enter the code from that page here: ', code => {
-    rl.close()
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token', err)
-      const dest = path.join(options.outDir, 'token.json')
-      if (fs.existsSync(dest)) {
-        fs.unlinkSync(dest)
-      }
-      fs.writeFileSync(dest, JSON.stringify(token), 'utf8')
-      console.log('Token stored to', dest)
-    })
-  })
+  const token = {
+    type: 'authorized_user',
+    client_id: credential.client_id,
+    client_secret: credential.client_secret,
+    refresh_token: client.credentials.refresh_token,
+  }
+  const dest = path.join(options.outDir, 'token.json')
+  if (fs.existsSync(dest)) {
+    fs.unlinkSync(dest)
+  }
+  fs.writeFileSync(dest, JSON.stringify(token), 'utf8')
 }
